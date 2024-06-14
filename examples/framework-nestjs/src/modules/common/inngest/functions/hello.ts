@@ -14,10 +14,14 @@ export const hello = (dependencies: {
   logger: Logger;
 }) => {
   return inngest.createFunction(
-    { id: 'hello-world' },
-    { event: 'job/hello.world' },
+    {
+      id: 'hello-world',
+      rateLimit: { limit: 2, period: '1h', key: 'event.data.accountId' },
+    },
+    { event: 'example/sync' },
     async ({ event, step }) => {
       await step.run('start-single-jobs', async () => {
+        console.log(`received: ${event.data.accountId}`);
         dependencies.logger.log(`Initiating Job`);
         dependencies.appService.helloWorld(); // Call helloWorld() method from app service provider
       });
